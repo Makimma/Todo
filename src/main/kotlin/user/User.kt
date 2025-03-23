@@ -14,7 +14,12 @@ data class User(
         private val email: String = "",
 
         @Column(nullable = false)
-        private val password: String = ""
+        private val password: String = "",
+
+        //new field for migration test (V2__add_index_email.sql)
+        @Column(nullable = false)
+        val name: String = "test_name"
+
 ) : UserDetails {
 
         override fun getUsername(): String = email
