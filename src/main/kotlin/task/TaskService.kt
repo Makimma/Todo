@@ -5,13 +5,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import ru.hse.user.User
 import ru.hse.user.UserRepository
-import java.time.LocalDateTime
+import org.slf4j.LoggerFactory
 
 @Service
 class TaskService(
     private val taskRepository: TaskRepository,
     private val userRepository: UserRepository
 ) {
+    private val logger = LoggerFactory.getLogger(TaskService::class.java)
 
     private fun getCurrentUser(): User {
         val email = SecurityContextHolder.getContext().authentication.name
@@ -21,6 +22,7 @@ class TaskService(
 
     fun getAllTasksForCurrentUser(): List<TaskResponse> {
         val user = getCurrentUser()
+        logger.info("Fetching tasks for user: ${user.getUsername()}")
         return taskRepository.findAllByUserId(user.id).map { task ->
             task.toResponse()
         }
@@ -32,6 +34,7 @@ class TaskService(
             description = request.description
             user = getCurrentUser()
         }
+        logger.info("Creating task for user: ${getCurrentUser().getUsername()} with title: ${request.title}")
         return taskRepository.save(task).toResponse()
     }
 
@@ -46,6 +49,7 @@ class TaskService(
 
         task.title = request.title
         task.description = request.description
+        logger.info("Updating task $id for user: ${user.getUsername()}")
         return taskRepository.save(task).toResponse()
     }
 
@@ -57,7 +61,7 @@ class TaskService(
         if (task.user.id != user.id) {
             throw IllegalAccessException("Not your task")
         }
-
+        logger.info("Deleting task $id for user: ${user.getUsername()}")
         taskRepository.delete(task)
     }
 }

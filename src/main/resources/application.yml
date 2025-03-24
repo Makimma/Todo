@@ -13,3 +13,10 @@ spring:
     properties:
       hibernate.hbm2ddl.auto: validate
     show-sql: true
+
+logging:
+  level:
+    root: INFO
+    ru.hse: DEBUG
+  file:
+    name: logs/app.log

@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import ru.hse.user.User
 import ru.hse.user.UserRepository
+import org.slf4j.LoggerFactory
 
 @Service
 class AuthService(
@@ -14,6 +15,7 @@ class AuthService(
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager
 ) {
+    private val logger = LoggerFactory.getLogger(AuthService::class.java)
 
     fun register(request: RegisterRequest): AuthResponse {
         if (userRepository.findByEmail(request.email) != null) {
@@ -27,6 +29,7 @@ class AuthService(
 
         userRepository.save(user)
         val jwtToken = jwtService.generateToken(user)
+        logger.info("Registering user: ${request.email}")
         return AuthResponse(token = jwtToken)
     }
 
@@ -41,6 +44,7 @@ class AuthService(
             ?: throw IllegalArgumentException("User not found")
 
         val jwtToken = jwtService.generateToken(user)
+        logger.info("Authenticating user: ${request.email}")
         return AuthResponse(token = jwtToken)
     }
 }
